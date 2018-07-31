@@ -57,5 +57,6 @@ function getLinkFromPage(domain) {
 
 //Get domain name from page url (local function)
 var domain = getDomain(hosturl);
+console.log(domain);
 //Get terms of service link from server (local function)
 getLinkFromPage(domain);

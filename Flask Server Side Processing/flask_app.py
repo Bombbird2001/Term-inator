@@ -70,6 +70,7 @@ my_cse_id = ""
 def apisearch(domain):
     res = {}
     api_no = 0
+    link = ""
     while True:
         api_key = my_api_keys[api_no]
         try:
@@ -79,6 +80,7 @@ def apisearch(domain):
         except:
             if api_no == 1:
                 res = [{'formattedUrl': "Failed to retrieve link"}]
+                return link
             api_no += 1
 
     links = res['items']
@@ -88,6 +90,7 @@ def apisearch(domain):
             link = result
             print("link changed to:", link)
             break
+    return link
 
 #results = apisearch("facebook")
 
@@ -98,9 +101,9 @@ def googleSearch(domain):
         query = str(domain) + " terms of service"
         iterator = search(query, tld="com", num=5, stop=1, pause=2)
         resultList = list(iterator)
-        print(resultList)
+        #print(resultList)
         link = ""
-        for result in iterator:
+        for result in resultList:
             if "term" in result or "service" in result or "condition" in result or "policy" in result or "policies" in result:
                 link = result
                 print("link changed to:", link)
@@ -109,10 +112,11 @@ def googleSearch(domain):
     except urllib.error.HTTPError as httperr:
         print(httperr.headers)  # Dump the headers to see if there's more information
         print(httperr.read())   # You can even read this error object just like a normal response file
-        return ""
+        link = apisearch(domain)
+        return link
     return ""
 
-#googleSearch("facebook")
+#googleSearch("stackoverflow")
 
 #filterTC("https://stackoverflow.com/legal/terms-of-service/public")
 
