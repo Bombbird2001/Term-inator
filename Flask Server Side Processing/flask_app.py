@@ -2,16 +2,16 @@ from flask import Flask, redirect, render_template, request, url_for
 from flask_cors import CORS, cross_origin
 from flask_sslify import SSLify
 import re
-import requests
 import json
 from bs4 import BeautifulSoup
 from gensim.summarization.summarizer import summarize
 from gensim.summarization import keywords
 from googlesearch import search
-import MySQLdb
 import urllib
 from googleapiclient.discovery import build
+from flask_sqlalchemy import SQLAlchemy
 
+##############Cleaning up html##############
 def visible(element):
     if element.parent.name in ['style', 'script', '[document]', 'head', 'title']:
         return False
@@ -37,7 +37,9 @@ def secondFilter(element):
 		else:
 			break
 	return element
+############################################
 
+#############Summarise function#############
 def filterTC(html):
     soup = BeautifulSoup(html, "lxml")
     data = soup.findAll(text=True)
@@ -64,6 +66,16 @@ def filterTC(html):
     print("Final length:", len(finalText))
     return json.dumps(finalText.split('.'))
 
+"""
+def filterText(text):
+    textLength = len(text)
+    rat = 6500 / textLength
+    finalText = summarize(text, ratio=rat)
+    return json.dumps(finalText.split('.'))
+"""
+############################################
+
+#########Google Search for links############
 my_api_keys = []
 my_cse_id = ""
 
@@ -78,21 +90,18 @@ def apisearch(domain):
             res = service.cse().list(q=domain + " terms of service", cx=my_cse_id, num=10).execute()
             break
         except:
-            if api_no == 1:
+            if api_no == len(my_api_keys) - 1:
                 res = [{'formattedUrl': "Failed to retrieve link"}]
                 return link
             api_no += 1
 
     links = res['items']
-    #print(res['items']['formattedUrl'])
     for result in links:
         if "term" in result or "service" in result or "condition" in result or "policy" in result or "policies" in result:
             link = result
             print("link changed to:", link)
             break
     return link
-
-#results = apisearch("facebook")
 
 def googleSearch(domain):
     if "google" in domain:
@@ -115,20 +124,51 @@ def googleSearch(domain):
         link = apisearch(domain)
         return link
     return ""
+#########################################
+#results = apisearch("facebook")
 
 #googleSearch("stackoverflow")
 
 #filterTC("https://stackoverflow.com/legal/terms-of-service/public")
 
+##########Init app, database############
 app = Flask(__name__)
 sslify = SSLify(app)
 #cors = CORS(app)
 #app.config['CORS_HEADERS'] = 'Content-Type'
 app.config["DEBUG"] = True
+SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
+    username="",
+    password="",
+    hostname="",
+    databasename="",
+)
+app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
+app.config["SQLALCHEMY_POOL_RECYCLE"] = 299
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+db = SQLAlchemy(app)
+
+class Weburl(db.Model):
+    __tablename__ = "termsofservice"
+    domain = db.Column(db.String(64), primary_key = True)
+    tosurl = db.Column(db.String(4096))
+    tc = db.Column(db.Text)
+########################################
+
+def insertData(domain, url, filteredHtml):
+    for row in db.session.query(Weburl.domain).all():
+        if row.domain == domain:
+            print("Found", domain)
+            return
+    db.session.add(Weburl(domain = domain, tosurl = url, tc = filteredHtml))
+    db.session.commit()
+    print(domain, "added")
+    return
 
 @app.route('/')
 def index():
-    return render_template("main_page.html")
+    #return render_template("main_page.html")
+    return "Nothing to see here!"
 
 @app.route('/getlink', methods=["POST"])
 #@cross_origin()
@@ -143,5 +183,15 @@ def getlink():
 @app.route('/gettc', methods=["POST"])
 def gettc():
     jsondata = request.get_json()
+    url = jsondata["url"]
+    domain = jsondata["domain"]
     html = jsondata["html"]
-    return filterTC(html)
+    filtered = filterTC(html)
+    insertData(domain, url, filtered)
+    return filtered
+
+@app.route('/gettcplaintext', methods = ["POST"])
+def gettcplaintext():
+    jsondata = request.get_json()
+    text = jsondata["text"]
+    return filterTC(text)

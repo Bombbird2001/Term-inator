@@ -11,7 +11,7 @@ function getDomain(hostdomain) {
 	return newDomain;
 }
 
-function getTCFromServer(html) {
+function getTCFromServer(html, domain, tclink) {
 	var xhttp = new XMLHttpRequest();
 	var url = "https://bombbird2001.pythonanywhere.com/gettc";
 	xhttp.open("POST", url, true);
@@ -22,16 +22,17 @@ function getTCFromServer(html) {
 			console.log("tc: " + JSON.parse(tc));
 		}
 	};
-	var data = JSON.stringify({"html": html});
+	var data = JSON.stringify({"html": html, "domain": domain, "url": tclink});
+	print(data);
 	//console.log(html);
 	xhttp.send(data);
 }
 
-function sendLink(url) {
+function sendLink(url, domain) {
 	chrome.runtime.sendMessage({type: "getHtml", tclink: url}, function(response) {
 		var rhtml = response.html;
 		//console.log("response html: " + rhtml);
-		getTCFromServer(rhtml);
+		getTCFromServer(rhtml, domain, url);
 	});
 }
 
@@ -46,7 +47,7 @@ function getLinkFromPage(domain) {
 			console.log("tclink: " + tclink);
 			//Once ready, run sendLink to get link of T&C from server (background function)
 			if (tclink != "Failed to retrieve link") {
-				sendLink(tclink);
+				sendLink(tclink, domain);
 			}
 		}
 	};
