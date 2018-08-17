@@ -152,16 +152,6 @@ def filterTC(html):
     		filtered.remove("")
     	except ValueError as e:
     		break
-
-    docList = filtered[:]
-    allWords = docList.split()
-    wordDict = UniqueWords(allWords)
-
-    N = len(docList)
-    for document in range(N):
-        docList[document]
-
-"""
     text = ' '.join(filtered)
     textLength = len(text)
     rat = 6500 / textLength
@@ -169,7 +159,6 @@ def filterTC(html):
     print(finalText)
     print("Initial length:", textLength)
     print("Final length:", len(finalText))
-    """
     return json.dumps(finalText.split('.'))
 
 """
@@ -254,6 +243,7 @@ app.config["SQLALCHEMY_POOL_RECYCLE"] = 299
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
+#Already initiaized but leaving it here anyways
 class Weburl(db.Model):
     __tablename__ = "termsofservice"
     domain = db.Column(db.String(64), primary_key = True)
