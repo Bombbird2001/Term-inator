@@ -40,6 +40,51 @@ def secondFilter(element):
 ############################################
 
 #############Summarise function#############
+
+def UniqueWords(wordDict):
+    unique_words = []
+    for b in wordDict:
+        if b not in unique_words:
+            unique_words.append(b)
+
+    return unique_words
+
+def TfCalculate (wordDict,document):
+    split = document.split()
+    bow = len(split)
+
+
+    tfDict = {}
+
+    for word in wordDict:
+        count = 0
+        for x in split:
+            if word == x:
+                count = count + 1
+        tfDict[word] = count/float(bow)
+
+    return tfDict
+
+def IdfCalculate(allWords,docList,wordDict):
+    IdfDict = {}
+    N = len(docList)
+
+    for word in wordDict:
+        count2 = 0
+        for a in allWords:
+            if word == a:
+                count2 = count2 + 1
+        IdfDict[word] = math.log10(N / float(count2))
+
+    return IdfDict
+
+
+def computeTFIDF(Tf, Idf, line):
+    TFIDF = {}
+    for lemeow in wordDict:
+        TFIDF[lemeow] = Tf[lemeow] * Idf[lemeow]
+    return (TFIDF)
+
 def filterTC(html):
     soup = BeautifulSoup(html, "lxml")
     data = soup.findAll(text=True)
@@ -57,6 +102,16 @@ def filterTC(html):
     		filtered.remove("")
     	except ValueError as e:
     		break
+
+    docList = filtered[:]
+    allWords = docList.split()
+    wordDict = UniqueWords(allWords)
+
+    N = len(docList)
+    for document in range(N):
+        docList[document]
+
+"""
     text = ' '.join(filtered)
     textLength = len(text)
     rat = 6500 / textLength
@@ -64,6 +119,7 @@ def filterTC(html):
     print(finalText)
     print("Initial length:", textLength)
     print("Final length:", len(finalText))
+    """
     return json.dumps(finalText.split('.'))
 
 """
