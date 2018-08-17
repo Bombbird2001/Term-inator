@@ -30,6 +30,7 @@ function getTCFromServer(html, domain, tclink) {
 
 function sendLink(url, domain) {
 	chrome.runtime.sendMessage({type: "getHtml", tclink: url}, function(response) {
+		//Once html from web is received, send to server for processing
 		var rhtml = response.html;
 		//console.log("response html: " + rhtml);
 		getTCFromServer(rhtml, domain, url);
@@ -47,6 +48,7 @@ function getLinkFromPage(domain) {
 			console.log("tclink: " + tclink);
 			//Once ready, run sendLink to get link of T&C from server (background function)
 			if (tclink != "Failed to retrieve link") {
+				//If server finds the link successfully, send link to background
 				sendLink(tclink, domain);
 			}
 		}
