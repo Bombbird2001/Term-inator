@@ -1,16 +1,60 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <style>
-      button {
+      #changeColor {
         height: 30px;
         width: 30px;
         outline: none;
       }
+      #bigBox {
+    width:450px;
+    padding: 10px;
+}
+.btn{
+  background-color: #4CAF50; /* Green */
+     border: 1px solid green;
+     color: white;
+     padding: 10px 10px;
+     text-align: center;
+     text-decoration: none;
+     display: inline-block;
+     font-size: 14px;
+     float: right;
+     cursor: pointer;
+     margin-left: 25px;
+     margin-top: 9px;
+     box-shadow: 0 5px #999;
+     font-family: "Comic Sans MS", cursive, sans-serif
+   }
+.btn:hover {background-color: #3e8e41}
+.btn:active {
+     background-color: #3e8e41;
+     box-shadow: 0 3px #666;
+     transform: translateY(2px);
+}
+
+h1 {
+font-family: "Courier New", Courier, monospace;
+float: left;
+display: inline-block;
+}
     </style>
   </head>
   <body>
+    <div id ="bigBox">
+
+    <h1> Term-inator </h1>
+    <button class = "btn paste"> Paste </button>
+    <button class = "btn others"> Others </button>
+    <button class = "btn important"> Important </button>
+
+     <br><br><br><br>
+
     <button id="changeColor"></button>
     <script src="popup.js"></script>
+
+    </div>
   </body>
 </html>
