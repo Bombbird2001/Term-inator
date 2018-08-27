@@ -1,8 +1,11 @@
 import math
+import re
 
 def getWords(line):
 	"""
 	Extract each word from the line
+	"""
+	return re.findall(r"[\w']+", line)
 	"""
 	chars = list(line)
 	chars.append(" ")
@@ -15,6 +18,7 @@ def getWords(line):
 			tmpList.append(''.join(tmpWord))
 			tmpWord = []
 	return tmpList
+	"""
 
 def UniqueWords(wordDict):
 	"""
@@ -44,7 +48,7 @@ def TfCalculate (wordDict, wordList):
 
 def IdfCalculate(listOfLines, wordsInDoc):
 	"""
-	Calculates log10(number of documents/number of documents word appears in) for each unique
+	Calculates log2(number of documents/number of documents word appears in) for each unique
 	word
 	"""
 	IdfDict = {}
@@ -56,7 +60,7 @@ def IdfCalculate(listOfLines, wordsInDoc):
 				if word == x:
 					count2 += 1
 					break
-		IdfDict[word] = math.log10(N / float(count2))
+		IdfDict[word] = math.log2(N / float(count2))
 	return IdfDict
 
 
@@ -97,8 +101,25 @@ def tfidf(lines):
 	return findImpWords(tfidfList)
 
 #25 words
-line1 = "When a Service requires or includes downloadable software, this software may be updated automatically on your device once a new version or feature is available."
+line1 = """You may need a Google Account in order to use some of our Services. You may create your own Google Account, or your Google Account may be assigned to you by an administrator, such as your employer or educational institution. If you are using a Google Account assigned to you by an administrator, different or additional terms may apply, and your administrator may be able to access or disable your account.
+
+To protect your Google Account, keep your password confidential. You are responsible for the activity that happens on or through your Google Account. Try not to reuse your Google Account password on third-party applications. If you learn of any unauthorised use of your password or Google Account, follow these instructions."""
 #10 words
-line2 = "Some Services may let you adjust your automatic update settings."
+line2 = """You must follow any policies made available to you within the Services.
+
+Do not misuse our Services, for example, do not interfere with our Services or try to access them using a method other than the interface and the instructions that we provide. You may use our Services only as permitted by law, including applicable export and control laws and regulations. We may suspend or stop providing our Services to you if you do not comply with our terms or policies or if we are investigating suspected misconduct.
+
+Using our Services does not give you ownership of any intellectual property rights in our Services or the content that you access. You may not use content from our Services unless you obtain permission from its owner or are otherwise permitted by law. These terms do not grant you the right to use any branding or logos used in our Services. Do not remove, obscure or alter any legal notices displayed in or along with our Services.
+
+Our Services display some content that is not Google’s. This content is the sole responsibility of the entity that makes it available. We may review content to determine whether it is illegal or violates our policies, and we may remove or refuse to display content that we reasonably believe violates our policies or the law. But that does not necessarily mean that we review content, so please do not assume that we do.
+
+In connection with your use of the Services, we may send you service announcements, administrative messages and other information. You may opt out of some of those communications.
+
+Some of our Services are available on mobile devices. Do not use such Services in a way that distracts you and prevents you from obeying traffic or safety laws."""
+
+line3 = "Google gives you a personal, worldwide, royalty-free, non-assignable and non-exclusive licence to use the software provided to you by Google as part of the Services."
+line4 = "This licence is for the sole purpose of enabling you to use and enjoy the benefit of the Services as provided by Google in the manner permitted by these terms. "
 lines = [line1, line2]
-print(tfidf(lines))
+returnList = tfidf(lines)
+for dictt in returnList:
+	print(sorted(dictt.items(), key = lambda x: x[1], reverse = True))
