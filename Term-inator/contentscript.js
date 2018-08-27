@@ -23,7 +23,6 @@ function getTCFromServer(html, domain, tclink) {
 		}
 	};
 	var data = JSON.stringify({"html": html, "domain": domain, "url": tclink});
-	print(data);
 	//console.log(html);
 	xhttp.send(data);
 }
