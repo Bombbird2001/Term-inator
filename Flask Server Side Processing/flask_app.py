@@ -1,5 +1,4 @@
-from flask import Flask, redirect, render_template, request, url_for
-from flask_cors import CORS, cross_origin
+from flask import Flask, redirect, render_template, request, url_for, abort
 from flask_sslify import SSLify
 import re
 import json
@@ -85,7 +84,7 @@ def TfCalculate (wordDict, wordList):
 
 def IdfCalculate(listOfLines, wordsInDoc):
 	"""
-	Calculates log10(number of documents/number of documents word appears in) for each unique
+	Calculates log2(number of documents/number of documents word appears in) for each unique
 	word
 	"""
 	IdfDict = {}
@@ -97,7 +96,7 @@ def IdfCalculate(listOfLines, wordsInDoc):
 				if word == x:
 					count2 += 1
 					break
-		IdfDict[word] = math.log10(N / float(count2))
+		IdfDict[word] = math.log2(N / float(count2))
 	return IdfDict
 
 
@@ -229,8 +228,6 @@ def googleSearch(domain):
 ##########Init app, database############
 app = Flask(__name__)
 sslify = SSLify(app)
-#cors = CORS(app)
-#app.config['CORS_HEADERS'] = 'Content-Type'
 app.config["DEBUG"] = True
 SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
     username="",
