@@ -1,4 +1,6 @@
 var parsedTcArray;
+var listContainer = document.getElementById('tc');
+var pasteContainer = document.getElementById('pastebox');
 
 chrome.runtime.onMessage.addListener(
 	function(request, sender, sendResponse) {
@@ -28,9 +30,11 @@ function removeWeirdElements() {
 }
 
 function importantFunction() {
-  document.getElementById("tc").innerHTML = "";
-  // Make a container element for the list
-     var listContainer = document.getElementById('tc');
+  if (listContainer.style.display == "none") {
+      listContainer.style.display = "block";
+  } else {
+      listContainer.style.display = "none";
+  }
 
      // Make the list
      var listElement = document.createElement('ul');
@@ -52,3 +56,13 @@ function importantFunction() {
          listElement.appendChild(listItem);
        }
 }
+
+document.getElementById("paste").addEventListener("click", pasteFunction);
+
+function pasteFunction (){
+      if (pasteContainer.style.display == "none") {
+          pasteContainer.style.display = "block";
+      } else {
+          pasteContainer.style.display = "none";
+      }
+  }
