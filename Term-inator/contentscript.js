@@ -30,6 +30,31 @@ function getTCFromServer(html, domain, tclink) {
 	xhttp.send(data);
 }
 
+chrome.runtime.onMessage.addListener(
+	function(request, sender, sendResponse) {
+		if (request.type == "getPaste") {
+			var paste = request.paste;
+			if (paste.length == 0) {
+				return false;
+			}
+			console.log("Received from popup: " + paste);
+			var xhttp = new XMLHttpRequest();
+			var url = "https://bombbird2001.pythonanywhere.com/getpaste";
+			xhttp.open("POST", url, true);
+			xhttp.setRequestHeader("Content-Type", "application/json");
+			xhttp.onreadystatechange = function() {
+				if (xhttp.readyState === 4 && xhttp.status === 200) {
+					var tc = "{\"tc\":" + xhttp.responseText + "}";
+					var parsedTc = JSON.parse(tc).tc.join("#");
+					sendResponse({parsed: parsedTc});
+				}
+			}
+			var data = JSON.stringify({"paste": paste});
+			xhttp.send(data);
+			return true;
+		}
+	});
+
 function sendLink(url, domain) {
 	chrome.runtime.sendMessage({type: "getHtml", tclink: url}, function(response) {
 		//Once html from web is received, send to server for processing

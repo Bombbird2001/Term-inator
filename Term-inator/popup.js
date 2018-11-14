@@ -14,6 +14,8 @@ chrome.runtime.onMessage.addListener(
 	});
 
 document.getElementById("important").addEventListener("click", importantFunction);
+document.getElementById("paste").addEventListener("click", pasteFunction);
+document.getElementById("pastebutton").addEventListener("click", sendPasted);
 
 if (parsedTcArray == undefined) {
   document.getElementById("tc").innerHTML = "Loading...";
@@ -30,11 +32,11 @@ function removeWeirdElements() {
 }
 
 function importantFunction() {
-  if (listContainer.style.display == "none") {
-      listContainer.style.display = "block";
-  } else {
-      listContainer.style.display = "none";
-  }
+	  if (listContainer.style.display == "none") {
+		  listContainer.style.display = "block";
+	  } else {
+		  listContainer.style.display = "none";
+	  }
 
      // Make the list
      var listElement = document.createElement('ul');
@@ -57,8 +59,6 @@ function importantFunction() {
        }
 }
 
-document.getElementById("paste").addEventListener("click", pasteFunction);
-
 function pasteFunction (){
       if (pasteContainer.style.display == "none") {
           pasteContainer.style.display = "block";
@@ -66,3 +66,14 @@ function pasteFunction (){
           pasteContainer.style.display = "none";
       }
   }
+  
+function sendPasted() {
+	let content = document.getElementById("terms").value;
+    console.log("Button clicked!");
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+		chrome.tabs.sendMessage(tabs[0].id, {type: "getPaste", paste: content}, function(response) {
+			let responseText = response.parsed;
+			console.log(responseText);
+		});
+	});
+}
