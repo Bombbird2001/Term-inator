@@ -2,9 +2,17 @@
 <html>
   <head>
     <style>
+
+
+
       #bigBox {
     width:450px;
     padding: 10px;
+}
+    #tc {
+  width:430px;
+  margin-top: 60px;
+
 }
 .btn{
   background-color: #4CAF50; /* Green */
@@ -37,16 +45,18 @@ display: inline-block;
     </style>
   </head>
   <body>
-    <div id ="bigBox">
+    <div id ="bigBox"  >
 
     <h1> Term-inator </h1>
-    <button class = "btn paste"> Paste </button>
-    <button class = "btn others"> Others </button>
-    <button class = "btn important"> Important </button>
+    <button class = "btn"> Paste </button>
+    <button class = "btn"> Others </button>
+    <button class = "btn" id = "important"> Important </button>
+
+    <div id  = "tc"> </div>
 
      <br><br><br><br>
-	
-	<script src="jquery-3.3.1.min.js"></script>
+
+   <script src="jquery-3.3.1.min.js"></script>
     <script src="popup.js"></script>
 
     </div>
