@@ -18,8 +18,11 @@ function getTCFromServer(html, domain, tclink) {
 	xhttp.setRequestHeader("Content-Type", "application/json");
 	xhttp.onreadystatechange = function() {
 		if (xhttp.readyState === 4 && xhttp.status === 200) {
-			var tc = xhttp.responseText;
-			console.log("tc: " + JSON.parse(tc));
+			var tc = "{\"tc\":" + xhttp.responseText + "}";
+			//console.log(tc);
+			var parsedTc = JSON.parse(tc).tc.join("#");
+			//console.log("tc: " + parsedTc);
+			sendToUI(parsedTc);
 		}
 	};
 	var data = JSON.stringify({"html": html, "domain": domain, "url": tclink});
@@ -55,6 +58,13 @@ function getLinkFromPage(domain) {
 	var data = JSON.stringify({"domain": domain});
 	console.log(data)
 	xhr.send(data);
+}
+
+function sendToUI(tc) {
+	chrome.runtime.sendMessage({type: "sendUI", data: tc}, function(response) {
+		console.log("Sent to UI!");
+		//No response expected
+	});
 }
 
 //Get domain name from page url (local function)

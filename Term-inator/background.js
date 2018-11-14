@@ -12,19 +12,6 @@ chrome.runtime.onMessage.addListener(
 			//var xhr = new XMLHttpRequest();
 			var url = request.tclink;
 			console.log("tclink: " + url);
-			/*
-			var method = "POST";
-			xhr.open(method, url, true);
-			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-			xhr.onreadystatechange = function() {
-				if (xhr.readyState === 4 && xhr.status === 200) {
-					var data = xhr.responseText;
-					sendResponse({html: data});
-					console.log("data: " + data);
-				}
-			};
-			xhr.send();
-			*/
 			$.get(url, function(responseText) {
 				sendResponse({html: responseText});
 			});
