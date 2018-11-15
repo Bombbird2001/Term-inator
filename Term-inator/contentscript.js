@@ -1,5 +1,8 @@
 var hosturl = window.location.hostname;
 const suffixes = [".com", ".org", ".co", ".gov"];
+var content;
+var domain;
+var sentOnce = false;
 
 function getDomain(hostdomain) {
 	//Replace www at start if present
@@ -19,14 +22,11 @@ function getTCFromServer(html, domain, tclink) {
 	xhttp.onreadystatechange = function() {
 		if (xhttp.readyState === 4 && xhttp.status === 200) {
 			var tc = "{\"tc\":" + xhttp.responseText + "}";
-			//console.log(tc);
-			var parsedTc = JSON.parse(tc).tc.join("#");
-			//console.log("tc: " + parsedTc);
-			sendToUI(parsedTc);
+			content = JSON.parse(tc).tc.join("#");
+			sendToUI();
 		}
 	};
 	var data = JSON.stringify({"html": html, "domain": domain, "url": tclink});
-	//console.log(html);
 	xhttp.send(data);
 }
 
@@ -37,7 +37,6 @@ chrome.runtime.onMessage.addListener(
 			if (paste.length == 0) {
 				return false;
 			}
-			console.log("Received from popup: " + paste);
 			var xhttp = new XMLHttpRequest();
 			var url = "https://bombbird2001.pythonanywhere.com/getpaste";
 			xhttp.open("POST", url, true);
@@ -53,13 +52,15 @@ chrome.runtime.onMessage.addListener(
 			xhttp.send(data);
 			return true;
 		}
+		if (request.type == "getContent") {
+			sendResponse({data: content, domain: domain, sent: sentOnce});
+		}
 	});
 
 function sendLink(url, domain) {
 	chrome.runtime.sendMessage({type: "getHtml", tclink: url}, function(response) {
 		//Once html from web is received, send to server for processing
 		var rhtml = response.html;
-		//console.log("response html: " + rhtml);
 		getTCFromServer(rhtml, domain, url);
 	});
 }
@@ -72,28 +73,27 @@ function getLinkFromPage(domain) {
 	xhr.onreadystatechange = function() {
 		if (xhr.readyState === 4 && xhr.status === 200) {
 			var tclink = xhr.responseText;
-			console.log("tclink: " + tclink);
 			//Once ready, run sendLink to get link of T&C from server (background function)
 			if (tclink != "Failed to retrieve link") {
 				//If server finds the link successfully, send link to background
 				sendLink(tclink, domain);
+			} else {
+				sendToUI();
 			}
 		}
 	};
 	var data = JSON.stringify({"domain": domain});
-	console.log(data)
 	xhr.send(data);
 }
 
-function sendToUI(tc) {
-	chrome.runtime.sendMessage({type: "sendUI", data: tc}, function(response) {
-		console.log("Sent to UI!");
+function sendToUI() {
+	chrome.runtime.sendMessage({type: "sendUI", data: content, domain: domain}, function(response) {
+		sentOnce = true;
 		//No response expected
 	});
 }
 
 //Get domain name from page url (local function)
-var domain = getDomain(hosturl);
-console.log(domain);
+domain = getDomain(hosturl);
 //Get terms of service link from server (local function)
 getLinkFromPage(domain);
