@@ -5,12 +5,13 @@
 
 #terms {
 	width: 100%;
-	padding: 12px 20px;
+	padding: 12px 5px;
 	margin: 8px 0;
 	display: inline-block;
 	border: 1px solid #ccc;
 	border-radius: 4px;
 	box-sizing: border-box;
+
 }
 
 #pastebutton {
@@ -92,7 +93,7 @@ h1 {
 	</head>
 	<body>
 		<div id ="bigBox"  >
-		
+
 			<h1> Term-inator </h1>
 			<button class = "btn" id = "paste"> Paste </button>
 			<button class = "btn" id = "others"> Others </button>
@@ -101,14 +102,15 @@ h1 {
 			<h3 id = "tc" style="display: none;"></h3>
 			<div id = "pastebox" style="display: none;">
 
-				Terms and conditions: <input type="terms" id="terms">
+				<h3> Terms and conditions: </h3>
+				<textarea rows="4" cols="55" type="terms" id="terms"> Paste here... </textarea>
 				<button id = "pastebutton">Summarize</button>
 
 			</div>
 			<h3 id = "warning"></h3>
 
 			<script src="popup.js"></script>
-			
+
 		</div>
 	</body>
 </html>

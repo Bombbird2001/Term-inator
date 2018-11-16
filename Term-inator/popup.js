@@ -81,10 +81,10 @@ function importantFunction(parsedTcArray) {
 		//If the data has not finished loading yet
 		return;
 	} //Otherwise run the code below
-	
+
 	//Set loading text to nothing
 	document.getElementById("tc").innerHTML = domain;
-	
+
 	// Make the list
 	var listElement = document.createElement('ul');
 
@@ -114,7 +114,7 @@ function pasteFunction () {
 		pasteContainer.style.display = "none";
 	}
 }
-  
+
 function sendPasted() {
 	let content = document.getElementById("terms").value;
 	if (content == undefined || content.length < 50 || content.split(".").length < 10) {
@@ -123,8 +123,41 @@ function sendPasted() {
 	}
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 		chrome.tabs.sendMessage(tabs[0].id, {type: "getPaste", paste: content}, function(response) {
+			document.getElementById("pastebox").innerHTML = "Loading...";
+
 			let responseText = response.parsed; //This is the text we want to display, each sentence separated by a #
 			console.log(responseText);
+			let parsedresponseText = responseText.split("#");
+			parsedresponseText = removeWeirdElements(parsedresponseText);
+
+			if (parsedresponseText == undefined) {
+				//If the data has not finished loading yet
+				return;
+			} //Otherwise run the code below
+
+			//Set loading text to nothing
+			document.getElementById("pastebox").innerHTML = domain;
+
+			// Make the list
+			var listElement = document.createElement('ul');
+
+			// Add it to the page
+			pasteContainer.appendChild(listElement);
+
+			// Set up a loop that goes through the items in listItems one at a time
+			var numberOfListItems = parsedresponseText.length;
+
+			for (var i = 0; i < numberOfListItems; ++i) {
+				// create an item for each one
+				var listItem = document.createElement('li');
+				listElement.setAttribute("class", "listContent");
+
+				// Add the item text
+				listItem.innerHTML = parsedresponseText[i];
+
+				// Add listItem to the listElement
+				listElement.appendChild(listItem);
+			}
 		});
 	});
 }
