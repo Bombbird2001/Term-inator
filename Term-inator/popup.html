@@ -34,12 +34,6 @@
 	padding: 10px;
 }
 
-#tc {
-	margin-top: 20px;
-	width:430px;
-	padding: 10px;
-}
-
 #pastebox {
   width:430px;
   margin-top: 70px;
@@ -53,6 +47,12 @@
 }
 
 #tc {
+	font-family: "Courier New", Courier, monospace;
+	float: left;
+	display: inline-block;
+}
+
+#othersList {
 	font-family: "Courier New", Courier, monospace;
 	float: left;
 	display: inline-block;
@@ -99,7 +99,8 @@ h1 {
 			<button class = "btn" id = "others"> Others </button>
 			<button class = "btn" id = "important"> Important </button>
 
-			<h3 id = "tc" style="display: none;"></h3>
+			<div id = "tc" style="display: none;"></div>
+			<div id = "othersList" style = "display: none;"></div>
 			<div id = "pastebox" style="display: none;">
 
 				<h3> Terms and conditions: </h3>

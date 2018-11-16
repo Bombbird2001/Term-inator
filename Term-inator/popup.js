@@ -1,3 +1,7 @@
+const keywords = ["third party", "third parties", "opt-out", "opt out",
+"arbitration", "waive", "waiver", "account", "content", "copyright", "privacy",
+"stop", "terminate"];
+
 //The current tab user is at; update this variable to show correct tab
 var tab = "important";
 var sent = false;
@@ -7,6 +11,9 @@ var domain = "";
 
 //Displays the list for important tab
 var listContainerImportant = document.getElementById('tc');
+
+//Displays the list for others tab
+var listContainerOthers = document.getElementById('othersList');
 
 //Displays the pastebox
 var pasteContainer = document.getElementById('pastebox');
@@ -32,21 +39,25 @@ document.getElementById("others").addEventListener("click", setOthers);
 document.getElementById("paste").addEventListener("click", setPaste);
 document.getElementById("pastebutton").addEventListener("click", sendPasted);
 
-document.getElementById("tc").innerHTML = "Loading...";
+listContainerImportant.innerHTML = "Loading...";
+listContainerOthers.innerHTML = "Loading...";
 
 function updateTab() {
 	//Updates the visibility of different tabs to show the correct tab
 	if (tab == "important") {
 		//Display important tab
 		listContainerImportant.style.display = "block";
+		listContainerOthers.style.display = "none";
 		pasteContainer.style.display = "none";
 	} else if (tab == "others") {
 		//Display others tab
 		listContainerImportant.style.display = "none";
+		listContainerOthers.style.display = "block";
 		pasteContainer.style.display = "none";
 	} else if (tab == "paste") {
 		//Display paste tab
 		listContainerImportant.style.display = "none";
+		listContainerOthers.style.display = "none";
 		pasteContainer.style.display = "block";
 	}
 }
@@ -82,14 +93,17 @@ function importantFunction(parsedTcArray) {
 		return;
 	} //Otherwise run the code below
 
-	//Set loading text to nothing
-	document.getElementById("tc").innerHTML = domain;
+	//Set loading text to domain
+	listContainerImportant.innerHTML = domain;
+	listContainerOthers.innerHTML = domain;
 
 	// Make the list
 	var listElement = document.createElement('ul');
+	var listElementOthers = document.createElement('ul');
 
 	// Add it to the page
 	listContainerImportant.appendChild(listElement);
+	listContainerOthers.appendChild(listElementOthers);
 
 	// Set up a loop that goes through the items in listItems one at a time
 	var numberOfListItems = parsedTcArray.length;
@@ -101,9 +115,22 @@ function importantFunction(parsedTcArray) {
 
 		// Add the item text
 		listItem.innerHTML = parsedTcArray[i];
-
-		// Add listItem to the listElement
-		listElement.appendChild(listItem);
+		
+		let hasKeyword = false;
+		for (let j = 0; j < keywords.length; j++) {
+			if (parsedTcArray[i].includes(keywords[j])) {
+				hasKeyword = true;
+				break;
+			}
+		}
+		
+		if (hasKeyword) {
+			// Add listItem to the listElement
+			listElement.appendChild(listItem);
+		} else {
+			//Add to listElementOthers
+			listElementOthers.appendChild(listItem);
+		}
 	}
 }
 
@@ -136,7 +163,7 @@ function sendPasted() {
 			} //Otherwise run the code below
 
 			//Set loading text to nothing
-			document.getElementById("pastebox").innerHTML = domain;
+			document.getElementById("pastebox").innerHTML = "";
 
 			// Make the list
 			var listElement = document.createElement('ul');
