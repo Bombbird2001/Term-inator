@@ -111,20 +111,23 @@ function importantFunction(parsedTcArray) {
 	for (var i = 0; i < numberOfListItems; ++i) {
 		// create an item for each one
 		var listItem = document.createElement('li');
-		listElement.setAttribute("class", "listContent");
 
 		// Add the item text
 		listItem.innerHTML = parsedTcArray[i];
 		
 		let hasKeyword = false;
 		for (let j = 0; j < keywords.length; j++) {
-			if (parsedTcArray[i].includes(keywords[j])) {
+			if (parsedTcArray[i].toLowerCase().includes(keywords[j])) {
 				hasKeyword = true;
 				break;
 			}
 		}
 		
 		if (hasKeyword) {
+			for (let j = 0; j < keywords.length; j++) {
+				let regExp = new RegExp(keywords[j], "gi");
+				listItem.innerHTML = listItem.innerHTML.replace(regExp, "<span class='highlight'>" + keywords[j] + "</span>");
+			}
 			// Add listItem to the listElement
 			listElement.appendChild(listItem);
 		} else {
