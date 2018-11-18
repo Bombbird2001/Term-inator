@@ -42,6 +42,8 @@ document.getElementById("pastebutton").addEventListener("click", sendPasted);
 listContainerImportant.innerHTML = "Loading...";
 listContainerOthers.innerHTML = "Loading...";
 
+warningMsg = document.getElementById("warning");
+
 function updateTab() {
 	//Updates the visibility of different tabs to show the correct tab
 	if (tab == "important") {
@@ -49,16 +51,19 @@ function updateTab() {
 		listContainerImportant.style.display = "block";
 		listContainerOthers.style.display = "none";
 		pasteContainer.style.display = "none";
+		warningMsg.style.display = "none";
 	} else if (tab == "others") {
 		//Display others tab
 		listContainerImportant.style.display = "none";
 		listContainerOthers.style.display = "block";
 		pasteContainer.style.display = "none";
+		warningMsg.style.display = "none";
 	} else if (tab == "paste") {
 		//Display paste tab
 		listContainerImportant.style.display = "none";
 		listContainerOthers.style.display = "none";
 		pasteContainer.style.display = "block";
+		warningMsg.style.display = "block";
 	}
 }
 
@@ -145,49 +150,58 @@ function pasteFunction () {
 	}
 }
 
+function loadPaste(response) {
+	let responseText = response.parsed; //This is the text we want to display, each sentence separated by a #
+	let parsedresponseText = responseText.split("#");
+	parsedresponseText = removeWeirdElements(parsedresponseText);
+
+	if (parsedresponseText == undefined) {
+		//If the data has not finished loading yet
+		return;
+	} //Otherwise run the code below
+
+	//Set loading text to nothing
+	document.getElementById("pastebox").innerHTML = "";
+
+	// Make the list
+	var listElement = document.createElement('ul');
+
+	// Add it to the page
+	pasteContainer.appendChild(listElement);
+
+	// Set up a loop that goes through the items in listItems one at a time
+	var numberOfListItems = parsedresponseText.length;
+
+	for (var i = 0; i < numberOfListItems; ++i) {
+		// create an item for each one
+		var listItem = document.createElement('li');
+		listElement.setAttribute("class", "listContent");
+
+		// Add the item text
+		listItem.innerHTML = parsedresponseText[i];
+		
+		//Highlight keywords if any
+		for (let j = 0; j < keywords.length; j++) {
+			let regExp = new RegExp(keywords[j], "gi");
+			listItem.innerHTML = listItem.innerHTML.replace(regExp, "<span class='highlight'>" + keywords[j] + "</span>");
+		}
+
+		// Add listItem to the listElement
+		listElement.appendChild(listItem);
+	}
+}
+
 function sendPasted() {
 	let content = document.getElementById("terms").value;
 	if (content == undefined || content.length < 50 || content.split(".").length < 10) {
-		document.getElementById("warning").innerHTML = "Input text is too short, it must have at least 10 sentences!";
+		warningMsg.innerHTML = "Input text is too short, it must have at least 10 sentences!";
 		return;
+	} else {
+		warningMsg.innerHTML = "";
 	}
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 		chrome.tabs.sendMessage(tabs[0].id, {type: "getPaste", paste: content}, function(response) {
-			document.getElementById("pastebox").innerHTML = "Loading...";
-
-			let responseText = response.parsed; //This is the text we want to display, each sentence separated by a #
-			console.log(responseText);
-			let parsedresponseText = responseText.split("#");
-			parsedresponseText = removeWeirdElements(parsedresponseText);
-
-			if (parsedresponseText == undefined) {
-				//If the data has not finished loading yet
-				return;
-			} //Otherwise run the code below
-
-			//Set loading text to nothing
-			document.getElementById("pastebox").innerHTML = "";
-
-			// Make the list
-			var listElement = document.createElement('ul');
-
-			// Add it to the page
-			pasteContainer.appendChild(listElement);
-
-			// Set up a loop that goes through the items in listItems one at a time
-			var numberOfListItems = parsedresponseText.length;
-
-			for (var i = 0; i < numberOfListItems; ++i) {
-				// create an item for each one
-				var listItem = document.createElement('li');
-				listElement.setAttribute("class", "listContent");
-
-				// Add the item text
-				listItem.innerHTML = parsedresponseText[i];
-
-				// Add listItem to the listElement
-				listElement.appendChild(listItem);
-			}
+			loadPaste(response);
 		});
 	});
 }
@@ -214,6 +228,14 @@ window.onload = function() {
 			let parsedTcArray = parsedTc.split("#");
 			parsedTcArray = removeWeirdElements(parsedTcArray);
 			importantFunction(parsedTcArray);
+		});
+		chrome.tabs.sendMessage(tabs[0].id, {type: "resumePaste"}, function(response) {
+			console.log("Received paste content! (Received on window load)");
+			if (response == undefined) {
+				console.log("Paste content response undefined!");
+				return;
+			}
+			loadPaste(response);
 		});
 	});
 }

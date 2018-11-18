@@ -1,6 +1,7 @@
 var hosturl = window.location.hostname;
 const suffixes = [".com", ".org", ".co", ".gov"];
 var content;
+var pasteContent;
 var domain;
 var sentOnce = false;
 
@@ -32,9 +33,10 @@ function getTCFromServer(html, domain, tclink) {
 
 chrome.runtime.onMessage.addListener(
 	function(request, sender, sendResponse) {
-		if (request.type == "getPaste") {
-			var paste = request.paste;
-			if (paste.length == 0) {
+		let requestType = request.type;
+		if (requestType == "getPaste") {
+			let requestPaste = request.paste;
+			if (requestPaste.length == 0) {
 				return false;
 			}
 			var xhttp = new XMLHttpRequest();
@@ -44,16 +46,19 @@ chrome.runtime.onMessage.addListener(
 			xhttp.onreadystatechange = function() {
 				if (xhttp.readyState === 4 && xhttp.status === 200) {
 					var tc = "{\"tc\":" + xhttp.responseText + "}";
-					var parsedTc = JSON.parse(tc).tc.join("#");
-					sendResponse({parsed: parsedTc});
+					pasteContent = JSON.parse(tc).tc.join("#");
+					sendResponse({parsed: pasteContent});
 				}
 			}
-			var data = JSON.stringify({"paste": paste});
+			var data = JSON.stringify({"paste": requestPaste});
 			xhttp.send(data);
 			return true;
 		}
-		if (request.type == "getContent") {
+		if (requestType == "getContent") {
 			sendResponse({data: content, domain: domain, sent: sentOnce});
+		}
+		if (reqeustType == "resumePaste") {
+			sendResponse({parsed: pasteContent});
 		}
 	});
 
